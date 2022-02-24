@@ -26,17 +26,18 @@ python3 -m venv ./ansivenv && source ./bin/activate
 ```
 8. Host for nginx:
 ```
-sudo yum install python3 pip
-python3 -m venv ./ansivenv && source ./bin/activate
+sudo yum install python2
 ```
 
-##### How to run
+#### How to run
 1. cd ~ && source .ansivenv/bin/activate
 2. git clone && cd ./123
 3. edit hosts and enter there nginx server
 4. ansible-playbook main.yaml
 
-##### Check result
+#### Check result
 open in browser
+```
 http://<host>
 https://<host>
+```

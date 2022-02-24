@@ -1,0 +1,153 @@
+---
+- name: configure webserver with tls
+  hosts: nodes
+  #gather_facts: true
+  #become: true
+  vars:
+    nginx_port_no_tls: 80
+    nginx_port_tls: 443
+    nginx_crt_dir: /etc/ssl/crt
+    nginx_pem_dir: /etc/ssl/private
+    nginx_csr_dir: /etc/ssl/csr
+    nginx_crt_name: nginx.crt
+    nginx_pem_name: nginx.pem
+    nginx_csr_name: nginx.csr
+  tasks:
+    - name: install some requirement packages
+      yum:
+        name: 
+          - gcc 
+          - openssl-devel
+          - libffi-devel
+          - python-devel
+          - python2-pip
+        update_cache: true
+        state: present
+
+    - name: Upgrade pip
+      pip:
+        name: pip==20.3.4
+        extra_args: --upgrade
+
+    - name: Install cryptography pip module
+      pip:
+        executable: /usr/bin/pip2
+        name:
+          - cryptography==1.6
+  
+    - name: Creates directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0644
+      with_items:
+      - "{{ nginx_crt_dir }}"
+      - "{{ nginx_pem_dir }}"
+      - "{{ nginx_csr_dir }}"
+
+    - openssl_privatekey:
+        path: "{{ nginx_pem_dir }}/{{ nginx_pem_name }}"
+        size: 2048 
+
+    - openssl_csr:
+        path: "{{ nginx_csr_dir }}/{{ nginx_csr_name }}"
+        privatekey_path: "{{ nginx_pem_dir }}/{{ nginx_pem_name }}"
+
+    - name: Generate a Self Signed OpenSSL certificate
+      community.crypto.x509_certificate:
+        csr_path: "{{ nginx_csr_dir }}/{{ nginx_csr_name }}"
+        path: "{{ nginx_crt_dir }}/{{ nginx_crt_name }}"
+        privatekey_path: "{{ nginx_pem_dir }}/{{ nginx_pem_name }}"
+        provider: selfsigned
+    
+    - name: Create nginx repo definition
+      copy:
+        src: nginx.repo
+        dest: /etc/yum.repos.d/nginx.repo
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Install nginx
+      yum:
+        name: nginx
+        update_cache: true
+        state: present
+
+    - name: copy main nginx config file
+      copy:
+        src: files/nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart nginx
+
+    - name: copy site's nginx config file
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/conf.d/sites.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart nginx
+
+    - name: copy index.html
+      template:
+        src: templates/index.html.j2
+        dest: /usr/share/nginx/html/index.html
+        owner: root
+        group: root
+        mode: 0644
+      # поидее рестартовать nginx при замене статики не обязательно. оставил по умолчанию как было в playbook
+      notify: restart nginx
+
+    - name: ensure nginx is enabled and started
+      service:
+        name: nginx
+        state: started
+        enabled: true
+
+    - name: insert firewalld rule for HTTP nginx
+      firewalld:
+        port: "{{ nginx_port_no_tls }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+      ignore_errors: true
+
+    - name: insert firewalld rule for HTTPS nginx
+      firewalld:
+        port: "{{ nginx_port_tls }}/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+      ignore_errors: true
+
+  post_tasks:
+    - name: check web site from control server via HTTP
+      become: false
+      uri:
+        url: "http://{{ ansible_host }}:{{ nginx_port_no_tls }}"
+        return_content: true
+      connection: local
+      register: example_webpage_out_http
+      failed_when: example_webpage_out_http.status != 200
+
+    - name: check web site from control server via HTTPS
+      become: false
+      uri:
+        url: "https://{{ ansible_host }}:{{ nginx_port_tls }}"
+        return_content: true
+        validate_certs: false
+      connection: local
+      register: example_webpage_out_https
+      failed_when: example_webpage_out_https.status != 200
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted

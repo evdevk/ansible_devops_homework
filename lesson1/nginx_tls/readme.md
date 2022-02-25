@@ -31,12 +31,12 @@ sudo yum install python2
 
 #### How to run
 1. cd ~ && source .ansivenv/bin/activate
-2. git clone && cd ./123
+2. git clone https://github.com/evdevk/ansible_devops_homework.git && cd ./ansible_devops_homework/lesson1/nginx_tls
 3. edit hosts and enter there nginx server
 4. ansible-playbook main.yaml
 
 #### Check result
-open in browser
+Open in the browser
 ```
 http://<host>
 https://<host>

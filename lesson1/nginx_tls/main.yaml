@@ -13,7 +13,13 @@
     nginx_pem_name: nginx.pem
     nginx_csr_name: nginx.csr
   tasks:
-    - name: install some requirement packages
+    - name: Install epel-release for repos with python2-pip
+      yum:
+        name:
+          - epel-release
+        state: present
+
+    - name: Install some requirement packages
       yum:
         name: 
           - gcc 
@@ -22,10 +28,12 @@
           - python-devel
           - python2-pip
         update_cache: true
+        validate_certs: false
         state: present
 
-    - name: Upgrade pip
+    - name: Upgrade pip to latest available pip2 release
       pip:
+        executable: /usr/bin/pip2
         name: pip==20.3.4
         extra_args: --upgrade
 

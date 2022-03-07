@@ -1,0 +1,4 @@
+# User comment description
+users_comment: "Ansible-generated user"
+# Pause between creating users in seconds
+create_user_pause: 5

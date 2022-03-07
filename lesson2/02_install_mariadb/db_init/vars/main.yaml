@@ -1,0 +1,12 @@
+# Ansible new user
+db_user: ansible_user
+# Ansible new user password
+db_password: ansible_pass123
+# Ansible will create database
+db_name: ansible_db
+# We change root password for this
+root_password: root_pass123
+
+# Versions of the packages we will install
+mariadb_version: "5.5.68-1"
+mysql_python_version: "1.2.5-1"

@@ -56,25 +56,18 @@ git clone https://github.com/evdevk/ansible_devops_homework.git && cd ./ansible_
 ```
 ansible-playbook main.yaml
 ```
-<br>
+
 ###### Tags:
-
-**generate\_cert**  - Generate certificate with test
-
-**generate\_cert\_test** \- Test certificate validation only
-
-**mariadb\_install** \- Install and test MariaDB
-
-**mariadb\_check** \- Test mariaDB with user and password only
-
-**nginx\_install** \- Install and test Nginx
-
-**nginx\_check** \- Test Nginx only
-
-**nginx\_tls\_install** \- Generate cert\, install Nginx and test
+generate_cert  - Generate certificate with test
+generate_cert_test - Test certificate validation only
+mariadb_install - Install and test MariaDB
+mariadb_check - Test mariaDB with user and password only
+nginx_install - Install and test Nginx
+nginx_check - Test Nginx only
+nginx_tls_install - Generate cert, install Nginx and test
 
 
-#### **Run with tags**
+###### Run with tags
 ```
 Install only mariadb:
 ansible-playbook main.yaml --tags mariadb_install

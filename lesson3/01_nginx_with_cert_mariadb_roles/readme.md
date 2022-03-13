@@ -73,7 +73,7 @@ nginx_tls_install - Generate cert, install Nginx and test
 Install only mariadb:
 ansible-playbook main.yaml --tags mariadb_install
 
-Install only nginx:****
+Install only nginx:
 ansible-playbook main.yaml --tags nginx_tls_install
 
 Only generate cert:

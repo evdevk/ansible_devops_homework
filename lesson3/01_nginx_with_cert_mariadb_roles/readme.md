@@ -32,7 +32,7 @@ cd
 python3 -m venv ./ansivenv && source ./bin/activate
 ```
 
-1. Host for nginx:
+8. Host for nginx:
 
 ```
 sudo yum install python2

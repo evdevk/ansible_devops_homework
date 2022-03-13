@@ -58,6 +58,7 @@ ansible-playbook main.yaml
 ```
 
 ###### Tags:
+```
 generate_cert  - Generate certificate with test
 generate_cert_test - Test certificate validation only
 mariadb_install - Install and test MariaDB
@@ -65,7 +66,7 @@ mariadb_check - Test mariaDB with user and password only
 nginx_install - Install and test Nginx
 nginx_check - Test Nginx only
 nginx_tls_install - Generate cert, install Nginx and test
-
+```
 
 ###### Run with tags
 ```

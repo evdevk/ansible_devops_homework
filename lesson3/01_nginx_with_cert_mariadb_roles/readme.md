@@ -46,7 +46,7 @@ sudo yum install python2
 cd ~ && source .bin/activate
 python3 -m pip install --upgrade pip && python3 -m pip install ansible==2.9.14
 ansible-galaxy collection install community.crypto
-git clone https://github.com/evdevk/ansible_devops_homework.git && cd ./ansible_devops_homework/lesson2/02_install_mariadb/db_init
+git clone https://github.com/evdevk/ansible_devops_homework.git && cd ./ansible_devops_homework/lesson3/01_nginx_with_cert_mariadb_roles/
 ```
 
 2. edit hosts and enter there remote server

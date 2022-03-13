@@ -1,0 +1,86 @@
+---
+# tasks file for role_install_nginx
+- name: Install and enable Nginx with OpenSSL
+  tags:
+    - nginx_install
+    - nginx_tls_install
+  block:
+  - name: Create nginx repo definition
+    copy:
+      src: nginx.repo
+      dest: /etc/yum.repos.d/nginx.repo
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Install nginx
+    yum:
+      name: nginx
+      update_cache: true
+      state: present
+
+  - name: Copy main nginx config file
+    copy:
+      src: files/nginx.conf
+      dest: /etc/nginx/nginx.conf
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart nginx
+
+  - name: Copy site's nginx config file
+    template:
+      src: templates/nginx.conf.j2
+      dest: /etc/nginx/conf.d/sites.conf
+      owner: root
+      group: root
+      mode: 0644
+    notify: Restart nginx
+
+  - name: Copy index.html
+    template:
+      src: templates/index.html.j2
+      dest: /usr/share/nginx/html/index.html
+      owner: root
+      group: root
+      mode: 0644
+    # поидее рестартовать nginx при замене статики не обязательно. оставил по умолчанию как было в playbook
+    notify: Restart nginx
+
+  - name: Ensure nginx is enabled and started
+    service:
+      name: nginx
+      state: started
+      enabled: true
+
+  - name: Populate service facts
+    service_facts:
+    register: srv_nginx_fact
+
+  - name: Ensure firewalld rule for nginx http is enabled
+    firewalld:
+      port: "{{ nginx_port_no_tls }}/tcp"
+      permanent: true
+      state: enabled
+      immediate: true
+    ignore_errors: true
+    when: srv_nginx_fact.ansible_facts.services["firewalld.service"].state == "running"
+
+  - name: Ensure firewalld rule for nginx https is enabled
+    firewalld:
+      port: "{{ nginx_port_tls }}/tcp"
+      permanent: true
+      state: enabled
+      immediate: true
+    ignore_errors: true
+    when: srv_nginx_fact.ansible_facts.services["firewalld.service"].state == "running"
+
+- name: Registering nginx setup test
+  command: /bin/true
+  notify: 
+    - Nginx http testing
+    - Nginx https testing
+  tags:
+    - nginx_install
+    - nginx_check
+    - nginx_tls_install

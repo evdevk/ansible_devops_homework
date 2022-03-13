@@ -1,0 +1,11 @@
+---
+# handlers file for role_install_mariadb
+- name: MariaDB testing
+  become: false
+  mysql_info:
+    login_user: "{{ db_user }}"
+    login_password: "{{ db_password }}"
+    filter:
+      - version
+      - users
+      - databases

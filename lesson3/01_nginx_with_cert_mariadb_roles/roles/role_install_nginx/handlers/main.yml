@@ -1,0 +1,25 @@
+---
+# handlers file for role_install_nginx
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: Nginx http testing
+  become: false
+  uri:
+    url: "http://{{ ansible_host }}:{{ nginx_port_no_tls }}"
+    return_content: true
+  connection: local
+  register: webpage_out_http
+  failed_when: webpage_out_http.status != 200
+
+- name: Nginx https testing
+  become: false
+  uri:
+    url: "https://{{ ansible_host }}:{{ nginx_port_tls }}"
+    return_content: true
+    validate_certs: false
+  connection: local
+  register: webpage_out_https
+  failed_when: webpage_out_https.status != 200

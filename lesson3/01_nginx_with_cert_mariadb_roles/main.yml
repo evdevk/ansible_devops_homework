@@ -1,0 +1,17 @@
+---
+- name: Install Nginx with certificate and MariaDB using roles
+  hosts: nodes
+  vars_files:
+      - vars/settings.yml
+  pre_tasks:
+    - name: Start of playbook
+      debug:
+        msg: "We're are starting to installing Nginx with certificate and MariaDB using roles"
+  roles:
+    - role: "role_generate_certificate"
+    - role: "role_install_nginx"
+    - role: "role_install_mariadb"
+  tasks:
+    - name: End of playbook
+      debug:
+        msg: "All successfully installed"

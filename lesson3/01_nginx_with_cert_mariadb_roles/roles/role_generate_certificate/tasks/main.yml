@@ -1,0 +1,71 @@
+---
+# tasks file for role_generate_certificate
+- name: Generate selfsigned certificate
+  tags: 
+    - generate_cert
+    - nginx_tls_install
+  block: 
+  - name: Install epel-release for repos with python2-pip
+    yum:
+      name:
+        - epel-release
+      state: present
+
+  - name: Install some requirement packages
+    yum:
+      name: 
+        - gcc
+        - openssl-devel
+        - libffi-devel
+        - python-devel
+        - python2-pip
+      update_cache: true
+      validate_certs: false
+      state: present
+
+  - name: Upgrade pip to latest available pip2 release
+    pip:
+      executable: /usr/bin/pip2
+      name: pip==20.3.4
+      extra_args: --upgrade
+
+  - name: Install cryptography pip module
+    pip:
+      executable: /usr/bin/pip2
+      name:
+        - cryptography==1.6
+
+  - name: Creates directories
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: 0644
+    with_items:
+    - "{{ nginx_crt_dir }}"
+    - "{{ nginx_pem_dir }}"
+    - "{{ nginx_csr_dir }}"
+
+  - openssl_privatekey:
+      path: "{{ nginx_pem_dir }}/{{ nginx_pem_name }}"
+      size: 2048
+
+  - openssl_csr:
+      path: "{{ nginx_csr_dir }}/{{ nginx_csr_name }}"
+      privatekey_path: "{{ nginx_pem_dir }}/{{ nginx_pem_name }}"
+
+  - name: Generate a Self Signed OpenSSL certificate
+    community.crypto.x509_certificate:
+      csr_path: "{{ nginx_csr_dir }}/{{ nginx_csr_name }}"
+      path: "{{ nginx_crt_dir }}/{{ nginx_crt_name }}"
+      privatekey_path: "{{ nginx_pem_dir }}/{{ nginx_pem_name }}"
+      provider: selfsigned
+
+- name: Registering certificate test
+  command: /bin/true
+  notify: Certificate testing
+  tags:
+    - generate_cert
+    - generate_cert_test
+    - nginx_tls_install

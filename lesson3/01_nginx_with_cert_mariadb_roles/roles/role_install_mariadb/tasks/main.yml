@@ -1,0 +1,82 @@
+---
+# tasks file for role_install_mariadb
+- name: Install and enable MariaDB
+  tags:
+    - mariadb_install
+  block:
+    - name: Install 'mariadb-server' and 'MySQL-python' packages
+      ansible.builtin.yum:
+        name: 
+          - mariadb-server >= "{{ mariadb_version }}"
+          - MySQL-python >= "{{ mysql_python_version }}"
+        state: present
+        update_cache: true
+      register: fact_packages_installed
+      when: ansible_facts.distribution | lower == "centos"
+
+    - name: Ensure 'mariadb' service is started and enabled
+      ansible.builtin.service:
+        name: mariadb
+        state: started
+        enabled: true
+      register: fact_mariadb_started
+      when: fact_packages_installed.rc | int == 0
+
+    - name: Update root password if needed
+      mysql_user:
+        name: root
+        password: "{{ root_password }}"
+        login_user: root
+        login_password: "{{ root_password }}"
+        host: localhost
+        state: present
+        check_implicit_admin: true
+        update_password: always
+      no_log: true
+      register: fact_root_password_changed
+      when: fact_mariadb_started.state | lower == "started"
+
+    - name: Create "{{ db_name }}" database
+      mysql_db:
+        name: "{{ db_name }}"
+        login_user: root
+        login_password: "{{ root_password }}"
+        state: present
+      no_log: true
+      register: fact_db_created
+      when: fact_mariadb_started.state | lower == "started"
+
+    - name: >
+        Create database user "{{ db_user }}"
+        and "{{ db_name }}".*:ALL privelege
+      mysql_user:
+        name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        login_user: root
+        login_password: "{{ root_password }}"
+        host: localhost
+        update_password: always
+        priv: '*.*:ALL'
+        state: present
+      no_log: true
+      when: fact_mariadb_started.failed | lower == "false"
+
+    - name: Populate service facts
+      service_facts:
+      register: srv_mariadb_fact
+
+    - name: Ensure firewalld rule for mariadb is enabled
+      firewalld:
+        port: "3306/tcp"
+        permanent: true
+        state: enabled
+        immediate: true
+      ignore_errors: true
+      when: srv_mariadb_fact.ansible_facts.services["firewalld.service"].state == "running"
+
+- name: Registering mariadb setup test
+  command: /bin/true
+  notify: MariaDB testing
+  tags:
+    - mariadb_install
+    - mariadb_check

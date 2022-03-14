@@ -18,7 +18,7 @@ nginx_csr_dir: /etc/ssl/csr
 # Names of certificate's crt, csr and private key:
 nginx_crt_name: nginx.crt
 nginx_pem_name: nginx.pem
-nginx_csr_name: nginx.csr
+nginx_csr_name: nginx2.csr
 
 # roles/role_install_mariadb vars
 # MariaDB user:

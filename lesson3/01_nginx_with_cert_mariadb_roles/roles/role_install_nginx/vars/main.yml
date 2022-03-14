@@ -12,3 +12,11 @@ nginx_config_path: "/etc/nginx/nginx.conf"
 nginx_config_site_path: "/etc/nginx/conf.d/sites.conf"
 # index.html path
 nginx_index_html_path: "/usr/share/nginx/html/index.html"
+# Folders for certificate crt, csr and private key location:
+nginx_crt_dir: /etc/ssl/crt
+nginx_pem_dir: /etc/ssl/private
+nginx_csr_dir: /etc/ssl/csr
+# Names of certificate's crt, csr and private key:
+nginx_crt_name: nginx.crt
+nginx_pem_name: nginx.pem
+nginx_csr_name: nginx.csr

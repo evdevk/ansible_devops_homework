@@ -3,6 +3,12 @@
 nginx_port_no_tls: 80
 # Nginx port for HTTPS:
 nginx_port_tls: 443
+# nginx.conf path
+nginx_config_path: "/etc/nginx/nginx.conf"
+# sites.conf path
+nginx_config_site_path: "/etc/nginx/conf.d/sites.conf"
+# index.html path
+nginx_index_html_path: "/usr/share/nginx/html/index.html"
 
 # roles/role_generate_certificate vars
 # Folders for certificate crt, csr and private key location:

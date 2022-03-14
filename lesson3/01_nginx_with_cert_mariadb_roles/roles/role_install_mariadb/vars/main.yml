@@ -1,2 +1,16 @@
 ---
 # vars file for role_install_mariadb
+
+# roles/role_install_mariadb vars
+# MariaDB user:
+db_user: ansible_user
+# MariaDB user password:
+db_password: ansible_pass123
+# MariaDB database:
+db_name: ansible_db
+# Overwrite MariaDB root password:
+root_password: root_pass123
+
+# Versions of the packages we will install
+mariadb_version: "5.5.68-1"
+mysql_python_version: "1.2.5-1"

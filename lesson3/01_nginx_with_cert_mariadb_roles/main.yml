@@ -1,6 +1,7 @@
 ---
 - name: Install Nginx with certificate and MariaDB using roles
   hosts: nodes
+  # Закомментировать vars_files, чтобы использовать переменные в ролях
   vars_files:
       - vars/settings.yml
   pre_tasks:

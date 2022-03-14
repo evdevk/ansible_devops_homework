@@ -1,2 +1,12 @@
 ---
 # vars file for role_generate_certificate
+
+# roles/role_generate_certificate vars
+# Folders for certificate crt, csr and private key location:
+nginx_crt_dir: /etc/ssl/crt
+nginx_pem_dir: /etc/ssl/private
+nginx_csr_dir: /etc/ssl/csr
+# Names of certificate's crt, csr and private key:
+nginx_crt_name: nginx.crt
+nginx_pem_name: nginx.pem
+nginx_csr_name: nginx.csr
